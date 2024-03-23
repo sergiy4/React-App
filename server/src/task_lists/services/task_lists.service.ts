@@ -17,19 +17,21 @@ export class TaskListsService {
     await this.taskListsRepository.save(newList);
   }
 
-  findAll() {
-    return `This action returns all taskLists`;
+  public async findAll() {
+    return this.taskListsRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} taskList`;
+  public async findOne(id: number) {
+    return this.taskListsRepository.findOne({
+      where: { id },
+    });
   }
 
-  update(id: number, updateTaskListDto: UpdateTaskListDto) {
-    return `This action updates a #${id} taskList`;
+  public async update(id: number, updateTaskListDto: UpdateTaskListDto) {
+    await this.taskListsRepository.update(id, updateTaskListDto);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} taskList`;
+  public async remove(id: number) {
+    await this.taskListsRepository.delete(id);
   }
 }
