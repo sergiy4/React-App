@@ -1,10 +1,20 @@
 import { AbstractEntity } from 'src/database/abstract.entity';
-import { Column, CreateDateColumn, Entity, UpdateDateColumn } from 'typeorm';
+import { Task } from 'src/tasks/entities/task.entity';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  OneToMany,
+  UpdateDateColumn,
+} from 'typeorm';
 
-@Entity()
-export class TaskList extends AbstractEntity<TaskList> {
+@Entity({ name: 'task_list' })
+export class TaskList extends AbstractEntity {
   @Column()
   name: string;
+
+  @OneToMany(() => Task, (task) => task.taskList)
+  tasks: Task[];
 
   @CreateDateColumn()
   createdAt: Date;

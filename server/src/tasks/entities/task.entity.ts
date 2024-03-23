@@ -1,8 +1,15 @@
 import { AbstractEntity } from 'src/database/abstract.entity';
-import { Column, CreateDateColumn, Entity, UpdateDateColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  UpdateDateColumn,
+} from 'typeorm';
+import { TaskList } from 'src/task_lists/entities/task_list.entity';
 
-@Entity()
-export class Task extends AbstractEntity<Task> {
+@Entity({ name: 'task' })
+export class Task extends AbstractEntity {
   @Column()
   name: string;
 
@@ -12,8 +19,12 @@ export class Task extends AbstractEntity<Task> {
   @Column()
   priority: string;
 
-  @Column()
-  dueDate: Date;
+  @ManyToOne(() => TaskList, (taskList) => taskList.tasks, {
+    cascade: true,
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
+  taskList: TaskList;
 
   @CreateDateColumn()
   createdAt: Date;
