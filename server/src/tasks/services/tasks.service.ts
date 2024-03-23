@@ -12,22 +12,25 @@ export class TasksService {
   ) {}
 
   public async create(createTaskDto: CreateTaskType) {
-    return 'This action adds a new task';
+    const newTask = this.taskRepository.create(createTaskDto);
+    await this.taskRepository.save(newTask);
   }
 
   public async findAll() {
-    return `This action returns all tasks`;
+    return this.taskRepository.find();
   }
 
   public async findOne(id: number) {
-    return `This action returns a #${id} task`;
+    return this.taskRepository.findOne({
+      where: { id },
+    });
   }
 
   public async update(id: number, updateTaskDto: Partial<UpdateTaskType>) {
-    return `This action updates a #${id} task`;
+    await this.taskRepository.update(id, updateTaskDto);
   }
 
   public async remove(id: number) {
-    return `This action removes a #${id} task`;
+    await this.taskRepository.delete(id);
   }
 }
