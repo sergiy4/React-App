@@ -20,22 +20,23 @@ export class TaskListsController {
 
   @Post()
   @UsePipes(new ValidationPipe())
-  async create(@Body() createTaskListDto: CreateTaskListDto) {
+  public async create(@Body() createTaskListDto: CreateTaskListDto) {
     return this.taskListsService.create(createTaskListDto);
   }
 
   @Get()
-  findAll() {
+  public async findAll() {
     return this.taskListsService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
+  public async findOne(@Param('id', ParseIntPipe) id: number) {
     return this.taskListsService.findOne(id);
   }
 
   @Patch(':id')
-  update(
+  @UsePipes(new ValidationPipe())
+  public async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateTaskListDto: UpdateTaskListDto,
   ) {
@@ -43,7 +44,7 @@ export class TaskListsController {
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number) {
+  public async remove(@Param('id', ParseIntPipe) id: number) {
     return this.taskListsService.remove(id);
   }
 }
