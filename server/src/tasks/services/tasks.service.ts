@@ -1,19 +1,37 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Task } from '../entities/task.entity';
-import { Repository } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateTaskType, UpdateTaskType } from '../libs/types/types';
+import { TaskListsService } from 'src/task_lists/services/task_lists.service';
 
 @Injectable()
 export class TasksService {
   constructor(
     @InjectRepository(Task)
     private readonly taskRepository: Repository<Task>,
+    private readonly tasksListService: TaskListsService,
+    private readonly entityManager: EntityManager,
   ) {}
 
   public async create(createTaskDto: CreateTaskType) {
-    const newTask = this.taskRepository.create(createTaskDto);
-    await this.taskRepository.save(newTask);
+    let newTask: Task;
+    if (createTaskDto.taskListId) {
+      const list = await this.tasksListService.findOne(
+        createTaskDto.taskListId,
+      );
+      if (!list)
+        throw new HttpException('List not found', HttpStatus.BAD_REQUEST);
+
+      newTask = this.taskRepository.create({
+        ...createTaskDto,
+        taskList: list,
+      });
+    } else {
+      newTask = this.taskRepository.create(createTaskDto);
+    }
+
+    await this.entityManager.save(newTask);
   }
 
   public async findAll() {
