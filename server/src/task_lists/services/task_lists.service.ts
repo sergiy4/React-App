@@ -18,7 +18,11 @@ export class TaskListsService {
   }
 
   public async findAll() {
-    return this.taskListsRepository.find();
+    return this.taskListsRepository.find({
+      relations: {
+        tasks: true,
+      },
+    });
   }
 
   public async findOne(id: number) {
