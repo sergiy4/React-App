@@ -9,6 +9,9 @@ export class CreateTaskDto {
   description: string;
 
   @IsNotEmpty()
+  listId: number;
+
+  @IsNotEmpty()
   @IsEnum(TaskPriority)
   priority: string;
 }
