@@ -4,6 +4,7 @@ import { EntityManager, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateTaskType, UpdateTaskType } from '../libs/types/types';
 import { TaskListsService } from 'src/task_lists/services/task_lists.service';
+import { TaskList } from 'src/task_lists/entities/task_list.entity';
 
 @Injectable()
 export class TasksService {
@@ -15,21 +16,15 @@ export class TasksService {
   ) {}
 
   public async create(createTaskDto: CreateTaskType) {
-    let newTask: Task;
-    if (createTaskDto.taskListId) {
-      const list = await this.tasksListService.findOne(
-        createTaskDto.taskListId,
-      );
-      if (!list)
-        throw new HttpException('List not found', HttpStatus.BAD_REQUEST);
+    const list = await this.tasksListService.findOne(createTaskDto.listId);
 
-      newTask = this.taskRepository.create({
-        ...createTaskDto,
-        taskList: list,
-      });
-    } else {
-      newTask = this.taskRepository.create(createTaskDto);
-    }
+    if (!list)
+      throw new HttpException('List not found', HttpStatus.BAD_REQUEST);
+
+    const newTask = this.taskRepository.create({
+      ...createTaskDto,
+      taskList: list,
+    });
 
     await this.entityManager.save(newTask);
   }
@@ -44,8 +39,22 @@ export class TasksService {
     });
   }
 
-  public async update(id: number, updateTaskDto: Partial<UpdateTaskType>) {
-    await this.taskRepository.update(id, updateTaskDto);
+  public async update(id: number, updateTaskDto: UpdateTaskType) {
+    const task = await this.taskRepository.findOneBy({ id });
+
+    task.name = updateTaskDto?.name;
+    task.description = updateTaskDto?.description;
+    task.priority = updateTaskDto?.priority;
+
+    if (updateTaskDto.listId) {
+      const list = await this.tasksListService.findOne(updateTaskDto.listId);
+
+      if (!list)
+        throw new HttpException('List not found', HttpStatus.BAD_REQUEST);
+      task.taskList = list;
+    }
+
+    await this.taskRepository.save(task);
   }
 
   public async remove(id: number) {
