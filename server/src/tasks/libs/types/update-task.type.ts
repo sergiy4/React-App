@@ -1,5 +1,6 @@
 export type UpdateTaskType = {
-  name: string;
-  description: string;
-  priority: string;
+  name?: string;
+  description?: string;
+  priority?: string;
+  listId?: number;
 };
