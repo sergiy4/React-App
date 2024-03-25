@@ -4,7 +4,6 @@ import { EntityManager, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateTaskType, UpdateTaskType } from '../libs/types/types';
 import { TaskListsService } from 'src/task_lists/services/task_lists.service';
-import { TaskList } from 'src/task_lists/entities/task_list.entity';
 
 @Injectable()
 export class TasksService {
@@ -17,7 +16,6 @@ export class TasksService {
 
   public async create(createTaskDto: CreateTaskType) {
     const list = await this.tasksListService.findOne(createTaskDto.listId);
-
     if (!list)
       throw new HttpException('List not found', HttpStatus.BAD_REQUEST);
 
@@ -36,12 +34,17 @@ export class TasksService {
   public async findOne(id: number) {
     return this.taskRepository.findOne({
       where: { id },
+      relations: {
+        histories: true,
+      },
     });
   }
 
   public async update(id: number, updateTaskDto: UpdateTaskType) {
     const task = await this.taskRepository.findOneBy({ id });
 
+    if (!task)
+      throw new HttpException('Task not found', HttpStatus.BAD_REQUEST);
     task.name = updateTaskDto?.name;
     task.description = updateTaskDto?.description;
     task.priority = updateTaskDto?.priority;
