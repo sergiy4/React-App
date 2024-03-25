@@ -32,7 +32,11 @@ export class TaskListsService {
   }
 
   public async update(id: number, updateTaskListDto: UpdateTaskListDto) {
-    await this.taskListsRepository.update(id, updateTaskListDto);
+    const list = await this.taskListsRepository.findOne({
+      where: { id },
+    });
+    list.name = updateTaskListDto.name;
+    await this.taskListsRepository.save(list);
   }
 
   public async remove(id: number) {

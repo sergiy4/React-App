@@ -4,9 +4,11 @@ import {
   CreateDateColumn,
   Entity,
   ManyToOne,
+  OneToMany,
   UpdateDateColumn,
 } from 'typeorm';
 import { TaskList } from 'src/task_lists/entities/task_list.entity';
+import { History } from 'src/histories/entities/history.entity';
 
 @Entity({ name: 'task' })
 export class Task extends AbstractEntity {
@@ -25,6 +27,9 @@ export class Task extends AbstractEntity {
     onUpdate: 'CASCADE',
   })
   taskList: TaskList;
+
+  @OneToMany(() => History, (history) => history.task)
+  histories: History[];
 
   @CreateDateColumn()
   createdAt: Date;
