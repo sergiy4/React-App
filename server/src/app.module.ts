@@ -3,6 +3,7 @@ import { DatabaseModule } from './database/database.module';
 import { ConfigModule } from '@nestjs/config';
 import { TaskListsModule } from './task_lists/task_lists.module';
 import { TasksModule } from './tasks/tasks.module';
+import { HistoriesModule } from './histories/histories.module';
 
 @Module({
   imports: [
@@ -10,6 +11,7 @@ import { TasksModule } from './tasks/tasks.module';
     ConfigModule.forRoot({ isGlobal: true }),
     TaskListsModule,
     TasksModule,
+    HistoriesModule,
   ],
   controllers: [],
   providers: [],
