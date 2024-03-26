@@ -1,7 +1,7 @@
 export {
   taskApi,
   useCreateTaskMutation,
-  useDeleteTaskQuery,
+  useDeleteTaskMutation,
   useGetAllTasksQuery,
   useGetOneTaskQuery,
   useUpdateTaskMutation,

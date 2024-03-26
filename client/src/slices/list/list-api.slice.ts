@@ -5,7 +5,7 @@ import {
   type UpdateListDto,
   type DeleteListRequestDto,
 } from '../../libs/types/types';
-import { ApiRoutes, HttpMethod } from '../../libs/enums/enums';
+import { ApiRoutes, HttpMethod, TAG } from '../../libs/enums/enums';
 import { apiSlice } from '../../libs/packages/api/api';
 
 export const listApi = apiSlice.instance.injectEndpoints({
@@ -18,6 +18,7 @@ export const listApi = apiSlice.instance.injectEndpoints({
           name,
         },
       }),
+      invalidatesTags: [TAG.LIST],
     }),
     updateList: builder.mutation<List, UpdateListDto>({
       query: ({ name, id }) => ({
@@ -27,24 +28,43 @@ export const listApi = apiSlice.instance.injectEndpoints({
           name,
         },
       }),
+      invalidatesTags: [TAG.LIST],
     }),
-    deleteList: builder.query<void, DeleteListRequestDto>({
+    deleteList: builder.mutation<void, DeleteListRequestDto>({
       query: ({ id }) => ({
         url: `${ApiRoutes.LIST}/${id}`,
         method: HttpMethod.DELETE,
       }),
+      invalidatesTags: [TAG.LIST],
     }),
     getAllLists: builder.query<GetListResponseDto[], void>({
       query: () => ({
         url: ApiRoutes.LIST,
         method: HttpMethod.GET,
       }),
+      providesTags: (result) => {
+        if (result) {
+          return [
+            { type: TAG.LIST, id: TAG.LIST },
+            ...result.map((list) => ({
+              type: TAG.LIST,
+              id: list.id,
+            })),
+          ];
+        } else return [{ type: TAG.LIST, id: TAG.LIST }];
+      },
     }),
-    getOneList: builder.query<GetListResponseDto[], { id: number }>({
+    getOneList: builder.query<GetListResponseDto, { id: number }>({
       query: ({ id }) => ({
         url: `${ApiRoutes.LIST}/${id}`,
         method: HttpMethod.GET,
       }),
+      providesTags: (result) => {
+        if (result) {
+          return [{ type: TAG.LIST, id: result.id }];
+        }
+        return [{ type: TAG.LIST, id: TAG.LIST }];
+      },
     }),
   }),
 });
@@ -54,5 +74,5 @@ export const {
   useUpdateListMutation,
   useGetAllListsQuery,
   useGetOneListQuery,
-  useDeleteListQuery,
+  useDeleteListMutation,
 } = listApi;
