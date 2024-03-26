@@ -5,7 +5,7 @@ import {
   type Task,
   type UpdateTaskRequestDto,
 } from '../../libs/types/types';
-import { ApiRoutes, HttpMethod } from '../../libs/enums/enums';
+import { ApiRoutes, HttpMethod, TAG } from '../../libs/enums/enums';
 import { apiSlice } from '../../libs/packages/api/api';
 
 export const taskApi = apiSlice.instance.injectEndpoints({
@@ -21,6 +21,7 @@ export const taskApi = apiSlice.instance.injectEndpoints({
           priority,
         },
       }),
+      invalidatesTags: [TAG.TASK],
     }),
     updateTask: builder.mutation<Task, UpdateTaskRequestDto>({
       query: ({ description, listId, name, priority, id }) => ({
@@ -33,24 +34,43 @@ export const taskApi = apiSlice.instance.injectEndpoints({
           priority,
         },
       }),
+      invalidatesTags: [TAG.TASK],
     }),
-    deleteTask: builder.query<void, DeleteTaskRequestDto>({
+    deleteTask: builder.mutation<void, DeleteTaskRequestDto>({
       query: ({ id }) => ({
         url: `${ApiRoutes.TASK}/${id}`,
         method: HttpMethod.DELETE,
       }),
+      invalidatesTags: [TAG.TASK],
     }),
     getAllTasks: builder.query<GetTaskResponseDto[], void>({
       query: () => ({
         url: ApiRoutes.TASK,
         method: HttpMethod.GET,
       }),
+      providesTags: (result) => {
+        if (result) {
+          return [
+            { type: TAG.TASK, id: TAG.TASK },
+            ...result.map((list) => ({
+              type: TAG.TASK,
+              id: list.id,
+            })),
+          ];
+        } else return [{ type: TAG.TASK, id: TAG.LIST }];
+      },
     }),
-    getOneTask: builder.query<GetTaskResponseDto[], { id: number }>({
+    getOneTask: builder.query<GetTaskResponseDto, { id: number }>({
       query: ({ id }) => ({
         url: `${ApiRoutes.TASK}/${id}`,
         method: HttpMethod.GET,
       }),
+      providesTags: (result) => {
+        if (result) {
+          return [{ type: TAG.TASK, id: result.id }];
+        }
+        return [{ type: TAG.TASK, id: TAG.LIST }];
+      },
     }),
   }),
 });
@@ -60,5 +80,5 @@ export const {
   useUpdateTaskMutation,
   useGetAllTasksQuery,
   useGetOneTaskQuery,
-  useDeleteTaskQuery,
+  useDeleteTaskMutation,
 } = taskApi;
