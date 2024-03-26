@@ -1,6 +1,7 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 import { type ConfigPackage } from '../config/consfig';
+import { TAG } from '../../enums/enums';
 
 class ApiSlice {
   #instance;
@@ -14,6 +15,7 @@ class ApiSlice {
       baseQuery: fetchBaseQuery({
         baseUrl: `${config.ENV.API.SERVER}${config.ENV.API.PATH}`,
       }),
+      tagTypes: [TAG.LIST, TAG.HISTORY, TAG.TASK],
       endpoints: (builder) => ({}),
     });
   }
