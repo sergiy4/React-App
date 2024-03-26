@@ -1,7 +1,7 @@
 export {
   listApi,
   useCreateListMutation,
-  useDeleteListQuery,
+  useDeleteListMutation,
   useGetAllListsQuery,
   useGetOneListQuery,
   useUpdateListMutation,
